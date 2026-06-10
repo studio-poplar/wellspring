@@ -38,6 +38,22 @@
       <div class="card" id="resultCard" style="display:none;">
         <h2>💡 あなたへのアドバイス</h2>
         <div id="result"></div>
+
+        <!-- 参考文献セクション -->
+        <div class="references-section">
+          <details>
+            <summary>📚 このアドバイスの根拠</summary>
+            <div class="references-content">
+              <p>このアドバイスは以下の科学的知識に基づいています：</p>
+              <ul>
+                <li>肌のpH管理（弱酸性環境の重要性）</li>
+                <li>皮脂と水分のバランス</li>
+                <li>参考文献：日本化粧品工業会、日本皮膚科学会ガイドラインなど</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+
         <div class="result-actions">
           <button class="copy-btn" onclick="copyAdvice()">📋 コピー</button>
           <div class="share-buttons">
@@ -67,6 +83,9 @@
 
   <footer>
     <p>Powered by Nu Skin × Well Spring</p>
+    <p class="footer-note">
+      <a href="https://www.nuskin.com/content/markets/ja_JP/home.html" target="_blank">ニュースキン公式サイト</a>
+    </p>
   </footer>
 
   <script src="script.js"></script>
