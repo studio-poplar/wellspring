@@ -1,52 +1,288 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Well Spring - ニュースキン美容・健康アドバイザー。AIがあなたの悩みに日本語でアドバイスします。">
-  <meta name="theme-color" content="#c8102e">
-  <title>Well Spring - 美容＆健康アドバイザー | ニュースキン</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <div class="header-inner">
-      <h1>💧 Well Spring</h1>
-      <p>あなたの美容・健康の悩みに答えます</p>
-    </div>
-  </header>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  <main>
-    <div class="card">
-      <label for="concern">お悩みやキーワードを入力してください</label>
-      <textarea id="concern" placeholder="例：乾燥肌が気になる、疲れやすい、シミを改善したい..." aria-label="美容・健康の悩み入力"></textarea>
-      <button id="submitBtn" onclick="getAdvice()">アドバイスを見る</button>
-      <div id="loading" class="loading" style="display:none;">
-        <div class="spinner"></div>
-        <p>考え中...</p>
-      </div>
-    </div>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Yu Gothic', 'Hiragino Sans', sans-serif;
+  background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
+  color: #333;
+  min-height: 100vh;
+  line-height: 1.6;
+}
 
-    <div class="card" id="resultCard" style="display:none;">
-      <h2>💡 あなたへのアドバイス</h2>
-      <div id="result"></div>
-      <div class="result-actions">
-        <button class="copy-btn" onclick="copyAdvice()">📋 コピー</button>
-        <div class="share-buttons">
-          <p class="share-label">シェア</p>
-          <button onclick="shareTwitter()">𝕏</button>
-          <button onclick="shareLine()">LINE</button>
-        </div>
-      </div>
-    </div>
+header {
+  background: linear-gradient(135deg, #c8102e, #8b0000);
+  color: white;
+  padding: 50px 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(200, 16, 46, 0.2);
+}
 
-    <p class="disclaimer">※このアドバイスはAIによる一般的な提案です。医療的な診断ではありません。</p>
-  </main>
+header h1 {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
 
-  <footer>
-    <p>Powered by Nu Skin × Well Spring</p>
-  </footer>
+header p {
+  font-size: clamp(0.9rem, 3vw, 1.1rem);
+  opacity: 0.95;
+  font-weight: 300;
+}
 
-  <script src="script.js"></script>
-</body>
-</html>
+main {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: #c8102e;
+  font-size: 1rem;
+}
+
+textarea {
+  width: 100%;
+  height: 140px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 14px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #c8102e;
+  box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.1);
+}
+
+textarea::placeholder {
+  color: #999;
+}
+
+button {
+  background: linear-gradient(135deg, #c8102e, #8b0000);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  width: 100%;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(200, 16, 46, 0.2);
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ローディング表示 */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  color: #c8102e;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(200, 16, 46, 0.2);
+  border-top: 4px solid #c8102e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading p {
+  font-weight: 600;
+  margin: 0;
+}
+
+h2 {
+  color: #c8102e;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+}
+
+#result {
+  line-height: 1.8;
+  white-space: pre-wrap;
+  font-size: 0.95rem;
+  word-wrap: break-word;
+  margin-bottom: 20px;
+}
+
+.result-actions {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.copy-btn {
+  background: #333;
+  flex: 0 1 auto;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  width: auto;
+  margin-top: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.copy-btn:hover {
+  background: #000;
+}
+
+.share-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.share-label {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.share-buttons button {
+  width: auto;
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  background: #333;
+}
+
+.share-buttons button:hover {
+  background: #000;
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  color: #999;
+  text-align: center;
+  margin-top: 20px;
+  line-height: 1.5;
+}
+
+footer {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 0.85rem;
+}
+
+/* スマホ対応（375px以上） */
+@media (max-width: 640px) {
+  header {
+    padding: 40px 20px;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  header p {
+    font-size: 0.9rem;
+  }
+
+  main {
+    margin: 30px auto;
+  }
+
+  .card {
+    padding: 24px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+  }
+
+  textarea {
+    height: 120px;
+    padding: 12px;
+    font-size: 16px; /* iOSズーム対策 */
+  }
+
+  button {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+  }
+
+  .result-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .copy-btn {
+    width: 100%;
+  }
+
+  .share-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* タブレット対応 */
+@media (max-width: 1024px) and (min-width: 641px) {
+  main {
+    max-width: 600px;
+  }
+}
