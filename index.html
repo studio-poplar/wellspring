@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Well Spring - 美容＆健康アドバイザー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>💧 Well Spring</h1>
+      <p>あなたの美容・健康の悩みに答えます</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <label for="concern">お悩みやキーワードを入力してください</label>
+      <textarea id="concern" placeholder="例：乾燥肌が気になる、疲れやすい、シミを改善したい..."></textarea>
+      <button id="submitBtn" onclick="getAdvice()">アドバイスを見る</button>
+    </div>
+
+    <div class="card" id="resultCard" style="display:none;">
+      <h2>💡 あなたへのアドバイス</h2>
+      <div id="result"></div>
+      <div class="share-buttons">
+        <p class="share-label">このアドバイスをシェア</p>
+        <button onclick="shareTwitter()">𝕏 でシェア</button>
+        <button onclick="shareLine()">LINE でシェア</button>
+      </div>
+    </div>
+
+    <p class="disclaimer">※このアドバイスはAIによる一般的な提案です。医療的な診断ではありません。</p>
+  </main>
+
+  <footer>
+    <p>Powered by Nu Skin × Well Spring</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
