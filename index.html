@@ -17,30 +17,52 @@
   </header>
 
   <main>
-    <div class="card">
-      <label for="concern">お悩みやキーワードを入力してください</label>
-      <textarea id="concern" placeholder="例：乾燥肌が気になる、疲れやすい、シミを改善したい..." aria-label="美容・健康の悩み入力"></textarea>
-      <button id="submitBtn" onclick="getAdvice()">アドバイスを見る</button>
-      <div id="loading" class="loading" style="display:none;">
-        <div class="spinner"></div>
-        <p>考え中...</p>
-      </div>
+    <!-- タブ切り替え -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="input">新規相談</button>
+      <button class="tab-btn" data-tab="history">📚 履歴 <span id="historyCount" class="badge"></span></button>
     </div>
 
-    <div class="card" id="resultCard" style="display:none;">
-      <h2>💡 あなたへのアドバイス</h2>
-      <div id="result"></div>
-      <div class="result-actions">
-        <button class="copy-btn" onclick="copyAdvice()">📋 コピー</button>
-        <div class="share-buttons">
-          <p class="share-label">シェア</p>
-          <button onclick="shareTwitter()">𝕏</button>
-          <button onclick="shareLine()">LINE</button>
+    <!-- 新規相談タブ -->
+    <div id="inputTab" class="tab-content active">
+      <div class="card">
+        <label for="concern">お悩みやキーワードを入力してください</label>
+        <textarea id="concern" placeholder="例：乾燥肌が気になる、疲れやすい、シミを改善したい..." aria-label="美容・健康の悩み入力"></textarea>
+        <button id="submitBtn" onclick="getAdvice()">アドバイスを見る</button>
+        <div id="loading" class="loading" style="display:none;">
+          <div class="spinner"></div>
+          <p>考え中...</p>
+        </div>
+      </div>
+
+      <div class="card" id="resultCard" style="display:none;">
+        <h2>💡 あなたへのアドバイス</h2>
+        <div id="result"></div>
+        <div class="result-actions">
+          <button class="copy-btn" onclick="copyAdvice()">📋 コピー</button>
+          <div class="share-buttons">
+            <p class="share-label">シェア</p>
+            <button onclick="shareTwitter()">𝕏</button>
+            <button onclick="shareLine()">LINE</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="disclaimer">※このアドバイスはAIによる一般的な提案です。医療的な診断ではありません。</p>
+    </div>
+
+    <!-- 履歴タブ -->
+    <div id="historyTab" class="tab-content">
+      <div class="card">
+        <div class="history-header">
+          <h2>📚 相談履歴</h2>
+          <button id="resetBtn" onclick="resetHistory()" class="reset-btn">🗑️ すべて削除</button>
+        </div>
+        <div id="historyList" class="history-list">
+          <p class="empty-message">まだ履歴がありません</p>
         </div>
       </div>
     </div>
-
-    <p class="disclaimer">※このアドバイスはAIによる一般的な提案です。医療的な診断ではありません。</p>
   </main>
 
   <footer>
