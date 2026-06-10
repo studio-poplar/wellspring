@@ -1,4 +1,4 @@
-const API_KEY = 'AQ.Ab8RN6Jamwx89nRe_KdLKW08Ppqku2C2nLsSKRQuyo-Cz3sA7g';
+const API_KEY = 'AQ.Ab8RN6L7YjGxZcy1lh8vwm19OXZqO4rN8DBLH_Uhb7pNAIEjhg';
 
 async function getAdvice() {
   const concern = document.getElementById('concern').value.trim();
