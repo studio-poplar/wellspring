@@ -2,40 +2,23 @@ const API_KEY = 'AQ.Ab8RN6L7YjGxZcy1lh8vwm19OXZqO4rN8DBLH_Uhb7pNAIEjhg';
 
 async function getAdvice() {
   const concern = document.getElementById('concern').value.trim();
-
-  if (!concern) {
-    alert('お悩みやキーワードを入力してください。');
-    return;
-  }
+  if (!concern) { alert('お悩みやキーワードを入力してください。'); return; }
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = '考え中...';
+  document.getElementById('resultCard').style.display = 'none';
 
-  const resultCard = document.getElementById('resultCard');
-  const result = document.getElementById('result');
-  resultCard.style.display = 'none';
+  const prompt = `あなたはニュースキン（Nu Skin）の美容・健康アドバイザーです。以下のお悩みに日本語で丁寧にアドバイスしてください。
 
-  const prompt = `
-あなたはニュースキン（Nu Skin）の美容・健康アドバイザーです。
-以下のお悩みやキーワードに対して、日本語で丁寧にアドバイスをしてください。
+【お悩み】${concern}
 
-【お悩み・キーワード】
-${concern}
-
-以下の3つの観点で具体的に回答してください：
-
+以下の3つで回答してください：
 1. 【スキンケア・生活習慣のアドバイス】
-日々のケア方法や生活習慣の改善点を教えてください。
+2. 【おすすめのニュースキン製品】（2〜3点、製品名と理由）
+3. 【おすすめのニュースキン サプリメント】（1〜2点、製品名と理由）
 
-2. 【おすすめのニュースキン製品】
-このお悩みに適したニュースキンのスキンケア製品を2〜3点、製品名と理由を添えて紹介してください。
-
-3. 【おすすめのニュースキン サプリメント】
-内側からのケアに役立つニュースキンのサプリメントを1〜2点、製品名と理由を添えて紹介してください。
-
-最後に、一言励ましのメッセージを添えてください。
-`;
+最後に励ましのメッセージをお願いします。`;
 
   try {
     const response = await fetch(
@@ -43,21 +26,17 @@ ${concern}
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       }
     );
-
     const data = await response.json();
+    if (data.error) { throw new Error(data.error.message); }
     const text = data.candidates[0].content.parts[0].text;
-
-    result.textContent = text;
-    resultCard.style.display = 'block';
-    resultCard.scrollIntoView({ behavior: 'smooth' });
-
+    document.getElementById('result').textContent = text;
+    document.getElementById('resultCard').style.display = 'block';
+    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
   } catch (error) {
-    alert('エラーが発生しました。もう一度お試しください。');
+    alert('エラー: ' + error.message);
   }
 
   btn.disabled = false;
