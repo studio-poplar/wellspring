@@ -286,3 +286,208 @@ footer {
     max-width: 600px;
   }
 }
+/* タブシステム */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #eee;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: #999;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab-btn:hover {
+  color: #666;
+}
+
+.tab-btn.active {
+  color: #c8102e;
+  border-bottom-color: #c8102e;
+}
+
+.badge {
+  display: inline-block;
+  background: #c8102e;
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 6px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* タブコンテンツ */
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 履歴リスト */
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.history-header h2 {
+  margin: 0;
+}
+
+.reset-btn {
+  background: #e74c3c;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  width: auto;
+  margin: 0;
+}
+
+.reset-btn:hover {
+  background: #c0392b;
+}
+
+.history-list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.history-item {
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.history-item:hover {
+  background: #f5f5f5;
+  border-color: #ddd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.history-item-date {
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.history-item-concern {
+  font-weight: 600;
+  color: #c8102e;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+}
+
+.history-item-preview {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  max-height: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre-wrap;
+}
+
+.history-item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.history-item-actions button {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  background: #333;
+  width: auto;
+  margin: 0;
+}
+
+.history-item-actions .copy-history {
+  background: #2ecc71;
+}
+
+.history-item-actions .copy-history:hover {
+  background: #27ae60;
+}
+
+.history-item-actions .delete-history {
+  background: #e74c3c;
+}
+
+.history-item-actions .delete-history:hover {
+  background: #c0392b;
+}
+
+.empty-message {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-size: 0.95rem;
+}
+
+/* スマホ対応 */
+@media (max-width: 640px) {
+  .tabs {
+    margin-bottom: 20px;
+  }
+
+  .tab-btn {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .reset-btn {
+    width: 100%;
+  }
+
+  .history-item {
+    padding: 12px;
+  }
+
+  .history-item-actions {
+    flex-direction: column;
+  }
+
+  .history-item-actions button {
+    width: 100%;
+  }
+}
