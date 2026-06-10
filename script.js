@@ -1,4 +1,4 @@
-const API_KEY = 'AQ.Ab8RN6L7YjGxZcy1lh8vwm19OXZqO4rN8DBLH_Uhb7pNAIEjhg';
+const API_KEY = 'AQ.Ab8RN6LC5GZfrth0bhEswpJcE8jfY0ydi5LV3A8EebsABKJWqg';
 
 async function getAdvice() {
   const concern = document.getElementById('concern').value.trim();
@@ -22,10 +22,13 @@ async function getAdvice() {
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       }
     );
