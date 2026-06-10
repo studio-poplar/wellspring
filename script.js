@@ -1,11 +1,27 @@
 const API_KEY = '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';
+let referenceData = '';
 
 // ========== 初期化 ==========
 document.addEventListener('DOMContentLoaded', () => {
+  loadReference(); // 参考文献を読み込む
   initTabs();
   loadHistory();
   updateHistoryCount();
 });
+
+// ========== 参考文献の読み込み ==========
+async function loadReference() {
+  try {
+    const response = await fetch(
+      'https://raw.githubusercontent.com/studio-poplar/wellspring/main/reference.md'
+    );
+    if (response.ok) {
+      referenceData = await response.text();
+    }
+  } catch (error) {
+    console.warn('参考文献の読み込みに失敗:', error);
+  }
+}
 
 // ========== タブ機能 ==========
 function initTabs() {
@@ -19,13 +35,11 @@ function initTabs() {
 }
 
 function switchTab(tabName) {
-  // タブボタンの状態更新
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.remove('active');
   });
   document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
 
-  // コンテンツの表示/非表示
   document.querySelectorAll('.tab-content').forEach(tab => {
     tab.classList.remove('active');
   });
@@ -48,16 +62,25 @@ async function getAdvice() {
   loading.style.display = 'flex';
   resultCard.style.display = 'none';
 
-  const prompt = `あなたはニュースキン（Nu Skin）の美容・健康アドバイザーです。以下のお悩みに日本語で丁寧にアドバイスしてください。
+  const systemPrompt = `あなたはスキンケア・美容・健康の専門家です。以下の参考文献を参考にしながら、科学的で信頼性の高いアドバイスを提供してください。
 
-【お悩み】${concern}
+【参考文献】
+${referenceData}
 
-以下の3つで回答してください：
-1. 【スキンケア・生活習慣のアドバイス】
-2. 【おすすめのニュースキン製品】（2〜3点、製品名と理由）
-3. 【おすすめのニュースキン サプリメント】（1〜2点、製品名と理由）
+【アドバイスの構成】
+1. 【一般的な知識】：悩みの原因を科学的に説明（肌のしくみ、pH、皮脂など）
+2. 【改善策】：生活習慣・スキンケアの具体的な改善方法
+3. 【ニュースキン製品の提案】：推奨製品（スキンケア2～3点＋サプリ1～2点）と理由
 
 最後に励ましのメッセージをお願いします。`;
+
+  const userPrompt = `【お悩み】${concern}
+
+以下の順で回答してください：
+1. 【原因の科学的説明】
+2. 【スキンケア・生活習慣の改善策】
+3. 【おすすめのニュースキン製品】
+4. 【励ましのメッセージ】`;
 
   try {
     const response = await fetch(
@@ -70,9 +93,12 @@ async function getAdvice() {
         },
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
-          messages: [{ role: 'user', content: prompt }],
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
           temperature: 0.7,
-          max_tokens: 1000
+          max_tokens: 1500
         })
       }
     );
@@ -89,15 +115,12 @@ async function getAdvice() {
     }
 
     const text = data.choices[0].message.content;
-    document.getElementById('result').textContent = text;
+    document.getElementById('result').innerHTML = formatAdvice(text);
     resultCard.style.display = 'block';
     resultCard.scrollIntoView({ behavior: 'smooth' });
 
-    // 履歴に保存
     saveToHistory(concern, text);
     updateHistoryCount();
-
-    // 入力をクリア
     document.getElementById('concern').value = '';
 
   } catch (error) {
@@ -122,6 +145,19 @@ async function getAdvice() {
   }
 }
 
+// ========== アドバイスをフォーマット ==========
+function formatAdvice(text) {
+  return text
+    .split('\n')
+    .map(line => {
+      if (line.match(/^【.+】/)) {
+        return `<strong style="color: #c8102e; font-size: 1.1em;">${escapeHtml(line)}</strong>`;
+      }
+      return escapeHtml(line);
+    })
+    .join('<br>');
+}
+
 // ========== 履歴管理 ==========
 function saveToHistory(concern, advice) {
   const history = getHistory();
@@ -131,8 +167,8 @@ function saveToHistory(concern, advice) {
     concern: concern,
     advice: advice
   };
-  history.unshift(newEntry); // 最新順
-  localStorage.setItem('wellspring_history', JSON.stringify(history.slice(0, 50))); // 最大50件
+  history.unshift(newEntry);
+  localStorage.setItem('wellspring_history', JSON.stringify(history.slice(0, 50)));
 }
 
 function getHistory() {
@@ -206,7 +242,8 @@ function copyHistoryItem(id) {
 
 // ========== コピー機能 ==========
 function copyAdvice() {
-  const resultText = document.getElementById('result').textContent;
+  const resultElement = document.getElementById('result');
+  const resultText = resultElement.textContent;
   if (!resultText) {
     alert('コピーするアドバイスがありません。');
     return;
