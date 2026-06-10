@@ -1,4 +1,4 @@
-const API_KEY = 'AQ.Ab8RN6LC5GZfrth0bhEswpJcE8jfY0ydi5LV3A8EebsABKJWqg';
+const API_KEY = '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';
 
 async function getAdvice() {
   const concern = document.getElementById('concern').value.trim();
@@ -22,19 +22,22 @@ async function getAdvice() {
 
   try {
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+      'https://api.groq.com/openai/v1/chat/completions',
       {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${API_KEY}`
         },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: prompt }]
+        })
       }
     );
     const data = await response.json();
     if (data.error) { throw new Error(data.error.message); }
-    const text = data.candidates[0].content.parts[0].text;
+    const text = data.choices[0].message.content;
     document.getElementById('result').textContent = text;
     document.getElementById('resultCard').style.display = 'block';
     document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
