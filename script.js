@@ -1,9 +1,11 @@
-const API_KEY = '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';
+const API_KEY = 'ここに取得したgsk_から始まるキーを貼り付け';
 let referenceData = '';
+let productsData = '';
 
 // ========== 初期化 ==========
 document.addEventListener('DOMContentLoaded', () => {
-  loadReference(); // 参考文献を読み込む
+  loadReference();
+  loadProducts();
   initTabs();
   loadHistory();
   updateHistoryCount();
@@ -20,6 +22,20 @@ async function loadReference() {
     }
   } catch (error) {
     console.warn('参考文献の読み込みに失敗:', error);
+  }
+}
+
+// ========== 製品情報の読み込み ==========
+async function loadProducts() {
+  try {
+    const response = await fetch(
+      'https://raw.githubusercontent.com/studio-poplar/wellspring/main/products.md'
+    );
+    if (response.ok) {
+      productsData = await response.text();
+    }
+  } catch (error) {
+    console.warn('製品情報の読み込みに失敗:', error);
   }
 }
 
@@ -62,24 +78,35 @@ async function getAdvice() {
   loading.style.display = 'flex';
   resultCard.style.display = 'none';
 
-  const systemPrompt = `あなたはスキンケア・美容・健康の専門家です。以下の参考文献を参考にしながら、科学的で信頼性の高いアドバイスを提供してください。
+  const systemPrompt = `あなたはスキンケア・美容・健康の専門家です。以下の参考文献と製品情報を参考にしながら、科学的で信頼性の高いアドバイスを提供してください。
 
 【参考文献】
 ${referenceData}
 
+【利用可能な製品】
+${productsData}
+
 【アドバイスの構成】
 1. 【一般的な知識】：悩みの原因を科学的に説明（肌のしくみ、pH、皮脂など）
 2. 【改善策】：生活習慣・スキンケアの具体的な改善方法
-3. 【ニュースキン製品の提案】：推奨製品（スキンケア2～3点＋サプリ1～2点）と理由
+3. 【ニュースキン製品の提案】：悩みに最適な製品を2～3点（スキンケア）と1～2点（サプリメント）推奨
+
+【製品推奨時の形式】
+推奨製品は必ず以下の形式で記載してください：
+"[製品名]（カテゴリ）"
+
+例：
+"[ageLOC RTSスキンセラム＋]（美容液）は、シワ・ハリに効果的です..."
+"[ageLOC ジェニユース]（美容サプリメント）はコラーゲンをサポートします..."
 
 最後に励ましのメッセージをお願いします。`;
 
   const userPrompt = `【お悩み】${concern}
 
 以下の順で回答してください：
-1. 【原因の科学的説明】
-2. 【スキンケア・生活習慣の改善策】
-3. 【おすすめのニュースキン製品】
+1. 【原因の科学的説明】：悩みの根本原因
+2. 【スキンケア・生活習慣の改善策】：具体的なステップ
+3. 【おすすめのニュースキン製品】：悩みに合った製品を厳選
 4. 【励ましのメッセージ】`;
 
   try {
@@ -115,7 +142,8 @@ ${referenceData}
     }
 
     const text = data.choices[0].message.content;
-    document.getElementById('result').innerHTML = formatAdvice(text);
+    const formattedAdvice = formatAdviceWithProducts(text);
+    document.getElementById('result').innerHTML = formattedAdvice;
     resultCard.style.display = 'block';
     resultCard.scrollIntoView({ behavior: 'smooth' });
 
@@ -145,9 +173,9 @@ ${referenceData}
   }
 }
 
-// ========== アドバイスをフォーマット ==========
-function formatAdvice(text) {
-  return text
+// ========== アドバイスをフォーマット（製品リンク自動化） ==========
+function formatAdviceWithProducts(text) {
+  let html = text
     .split('\n')
     .map(line => {
       if (line.match(/^【.+】/)) {
@@ -156,6 +184,33 @@ function formatAdvice(text) {
       return escapeHtml(line);
     })
     .join('<br>');
+
+  // [製品名] を検出してリンク化
+  html = linkifyProducts(html);
+
+  return html;
+}
+
+// ========== 製品リンク自動化 ==========
+function linkifyProducts(html) {
+  // products.mdから製品情報を抽出
+  const productRegex = /### (.+?)\n- \*\*URL\*\*: (.+?)\n/g;
+  const products = {};
+  
+  let match;
+  while ((match = productRegex.exec(productsData)) !== null) {
+    products[match[1].trim()] = match[2].trim();
+  }
+
+  // HTMLで [製品名] を見つけてリンク化
+  Object.keys(products).forEach(productName => {
+    const pattern = new RegExp(`\\[${escapeRegex(productName)}\\]`, 'g');
+    const url = products[productName];
+    const link = `<a href="${url}" target="_blank" style="color: #c8102e; text-decoration: underline; font-weight: 600;">[${productName}]</a>`;
+    html = html.replace(pattern, link);
+  });
+
+  return html;
 }
 
 // ========== 履歴管理 ==========
@@ -283,4 +338,8 @@ function escapeHtml(text) {
     "'": '&#039;'
   };
   return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function escapeRegex(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
