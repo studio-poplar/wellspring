@@ -1,4 +1,4 @@
-const API_KEY = 'ここに取得したgsk_から始まるキーを貼り付け';
+const API_KEY = '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';
 let referenceData = '';
 let productsData = '';
 
