@@ -1,0 +1,7 @@
+# API Keys & Secrets
+*.key
+.env
+.env.local
+
+# Sensitive files
+script.js
