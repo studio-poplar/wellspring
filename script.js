@@ -1,4 +1,3 @@
-const API_KEY = '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';
 let referenceData = '';
 let productsData = '';
 
@@ -105,21 +104,15 @@ ${productsData}
 
   try {
     const response = await fetch(
-      'https://api.groq.com/openai/v1/chat/completions',
+      '/api/groq',
       {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
-          ],
-          temperature: 0.7,
-          max_tokens: 1000
+          systemPrompt: systemPrompt,
+          userPrompt: userPrompt
         })
       }
     );
@@ -127,15 +120,15 @@ ${productsData}
     const data = await response.json();
 
     if (!response.ok || data.error) {
-      const errorMsg = data.error?.message || 'APIエラーが発生しました';
+      const errorMsg = data.error || 'APIエラーが発生しました';
       throw new Error(errorMsg);
     }
 
-    if (!data.choices || !data.choices[0]) {
+    if (!data.success || !data.content) {
       throw new Error('応答形式が不正です');
     }
 
-    const text = data.choices[0].message.content;
+    const text = data.content;
     const formattedAdvice = formatAdviceWithProducts(text);
     document.getElementById('result').innerHTML = formattedAdvice;
     resultCard.style.display = 'block';
