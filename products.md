@@ -88,3 +88,9 @@
 - **URL**: https://www.nuskin.com/markets/ja_JP/topnav-supplements/secret.html
 - **カテゴリ**: 美容サプリメント
 - **説明**: 内側からの美容サポート。コラーゲン・ヒアルロン酸。
+
+### エクストラマイルド
+- **URL**: https://www.nuskin.com/markets/ja_JP/home/updates_info/product_info_top/extramild.html
+- **Image**: https://media.nuskin.com/m/1ed1330123b15c84/original/extramild-lp-process_sp.png
+- **カテゴリ**: トータルスキンケア
+- **説明**: 敏感肌のための低刺激スキンケア。うるおいのベールで肌をやさしく守り、乾燥や外部刺激に負けない健やかな肌の土台づくりをサポートします。
