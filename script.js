@@ -87,27 +87,21 @@ ${referenceData}
 ${productsData}
 
 【アドバイスの構成】
-1. 【一般的な知識】：悩みの原因を科学的に説明（肌のしくみ、pH、皮脂など）
-2. 【改善策】：生活習慣・スキンケアの具体的な改善方法
-3. 【ニュースキン製品の提案】：悩みに最適な製品を2～3点（スキンケア）と1～2点（サプリメント）推奨
+1. 【原因と対策】：悩みの原因を簡潔に説明し、改善方法を箇条書きで列挙（全体で3～4行）
+2. 【おすすめ製品】：悩みに合った製品を1～2点推奨（製品名とURL形式: [製品名](URL)）
+3. 【まとめ】：このアドバイスの重要なポイントを箇条書き（3～5点）
 
-【製品推奨時の形式】
-推奨製品は必ず以下の形式で記載してください：
-"[製品名]（カテゴリ）"
-
-例：
-"[ageLOC RTSスキンセラム＋]（美容液）は、シワ・ハリに効果的です..."
-"[ageLOC ジェニユース]（美容サプリメント）はコラーゲンをサポートします..."
-
-最後に励ましのメッセージをお願いします。`;
+【重要な制約】
+- 励ましのメッセージは不要
+- 文字数は簡潔に（全体で500字以内）
+- 製品推奨は形式: [製品名](https://...)`;
 
   const userPrompt = `【お悩み】${concern}
 
-以下の順で回答してください：
-1. 【原因の科学的説明】：悩みの根本原因
-2. 【スキンケア・生活習慣の改善策】：具体的なステップ
-3. 【おすすめのニュースキン製品】：悩みに合った製品を厳選
-4. 【励ましのメッセージ】`;
+以下の順で簡潔に答えてください：
+1. 【原因と対策】：原因 + 改善策（箇条書き）
+2. 【おすすめ製品】：推奨製品（1～2点、リンク付き）
+3. 【まとめ】：重要なポイント（箇条書き3～5点）`;
 
   try {
     const response = await fetch(
@@ -125,7 +119,7 @@ ${productsData}
             { role: 'user', content: userPrompt }
           ],
           temperature: 0.7,
-          max_tokens: 1500
+          max_tokens: 1000
         })
       }
     );
@@ -173,7 +167,7 @@ ${productsData}
   }
 }
 
-// ========== アドバイスをフォーマット（製品リンク自動化） ==========
+// ========== アドバイスをフォーマット（製品リンク・画像自動化） ==========
 function formatAdviceWithProducts(text) {
   let html = text
     .split('\n')
@@ -181,33 +175,49 @@ function formatAdviceWithProducts(text) {
       if (line.match(/^【.+】/)) {
         return `<strong style="color: #c8102e; font-size: 1.1em;">${escapeHtml(line)}</strong>`;
       }
+      if (line.match(/^-/)) {
+        return `<li>${escapeHtml(line.substring(1).trim())}</li>`;
+      }
       return escapeHtml(line);
     })
     .join('<br>');
 
-  // [製品名] を検出してリンク化
-  html = linkifyProducts(html);
+  // リスト化
+  html = html.replace(/(<li>.*?<\/li>)(<li>|$)/g, '<ul>$1</ul>$2');
+
+  // [製品名](URL) をHTMLリンクに変換
+  html = linkifyProductsWithImages(html);
 
   return html;
 }
 
-// ========== 製品リンク自動化 ==========
-function linkifyProducts(html) {
+// ========== 製品リンク・画像自動化 ==========
+function linkifyProductsWithImages(html) {
   // products.mdから製品情報を抽出
-  const productRegex = /### (.+?)\n- \*\*URL\*\*: (.+?)\n/g;
+  const productRegex = /### (.+?)\n- \*\*URL\*\*: (.+?)\n- \*\*Image\*\*: (.+?)\n/g;
   const products = {};
   
   let match;
   while ((match = productRegex.exec(productsData)) !== null) {
-    products[match[1].trim()] = match[2].trim();
+    products[match[1].trim()] = {
+      url: match[2].trim(),
+      image: match[3].trim()
+    };
   }
 
-  // HTMLで [製品名] を見つけてリンク化
-  Object.keys(products).forEach(productName => {
-    const pattern = new RegExp(`\\[${escapeRegex(productName)}\\]`, 'g');
-    const url = products[productName];
-    const link = `<a href="${url}" target="_blank" style="color: #c8102e; text-decoration: underline; font-weight: 600;">[${productName}]</a>`;
-    html = html.replace(pattern, link);
+  // Markdown形式 [製品名](URL) をHTMLに変換
+  const linkRegex = /\[(.+?)\]\((https?:\/\/.+?)\)/g;
+  html = html.replace(linkRegex, (match, productName, url) => {
+    const productInfo = products[productName];
+    if (productInfo && productInfo.image) {
+      // 製品カード表示
+      return `<div class="product-card">
+        <img src="${escapeHtml(productInfo.image)}" alt="${escapeHtml(productName)}" class="product-image">
+        <h4>${escapeHtml(productName)}</h4>
+        <a href="${escapeHtml(productInfo.url)}" target="_blank" class="product-link">公式ページへ →</a>
+      </div>`;
+    }
+    return `<a href="${escapeHtml(url)}" target="_blank" style="color: #c8102e; text-decoration: underline;">${escapeHtml(productName)}</a>`;
   });
 
   return html;
@@ -338,8 +348,4 @@ function escapeHtml(text) {
     "'": '&#039;'
   };
   return text.replace(/[&<>"']/g, m => map[m]);
-}
-
-function escapeRegex(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
